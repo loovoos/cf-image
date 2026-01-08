@@ -12,7 +12,7 @@ const corsHeaders = {
 
 export async function POST(request) {
 	const { env, cf, ctx } = getRequestContext();
-	
+
 	if (!env.TG_BOT_TOKEN || !env.TG_CHAT_ID) {
 		return Response.json({
 			status: 500,
@@ -82,9 +82,8 @@ export async function POST(request) {
 			})
 		} else {
 			try {
-				const rating_index = await getRating(env, `${fileData.file_id}`);
-				const nowTime = await get_nowTime()
-				await insertImageData(env.IMG, `/cfile/${fileData.file_id}`, Referer, clientIp, rating_index, nowTime);
+				const nowTime = await get_nowTime();
+				await insertImageData(env.IMG, `/cfile/${fileData.file_id}`, clientIp, nowTime);
 
 				return Response.json({
 					...data,
@@ -103,7 +102,8 @@ export async function POST(request) {
 
 			} catch (error) {
 				console.log(error);
-				await insertImageData(env.IMG, `/cfile/${fileData.file_id}`, Referer, clientIp, -1, nowTime);
+				const nowTime = await get_nowTime();
+				await insertImageData(env.IMG, `/cfile/${fileData.file_id}`, clientIp, nowTime);
 
 
 				return Response.json({
@@ -192,15 +192,14 @@ const getFile = async (response) => {
 
 
 
-async function insertImageData(env, src, referer, ip, rating, time) {
+async function insertImageData(env, url, ip, time) {
 	try {
-		const instdata = await env.prepare(
-			`INSERT INTO imginfo (url, referer, ip, rating, total, time)
-           VALUES ('${src}', '${referer}', '${ip}', ${rating}, 1, '${time}')`
-		).run()
+		await env.prepare(
+			`INSERT INTO imginfo (url, ip, time) VALUES (?, ?, ?)`
+		).bind(url, ip, time).run();
 	} catch (error) {
-
-	};
+		console.error('数据库插入失败:', error.message);
+	}
 }
 
 

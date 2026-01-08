@@ -69,7 +69,7 @@ export async function POST(request) {
 
         // 记录到数据库
         if (env.IMG && result.success) {
-            await insertImageData(env.IMG, result.path, referer, clientIp, 0, getNowTime());
+            await insertImageData(env.IMG, result.path, clientIp, getNowTime());
         }
 
         return Response.json({
@@ -195,12 +195,12 @@ function getFileFromResponse(response) {
     }
 }
 
-// 插入数据库记录（使用参数化查询防止SQL注入）
-async function insertImageData(db, src, referer, ip, rating, time) {
+// 插入数据库记录（只记录 url、ip、time）
+async function insertImageData(db, url, ip, time) {
     try {
         await db.prepare(
-            `INSERT INTO imginfo (url, referer, ip, rating, total, time) VALUES (?, ?, ?, ?, 1, ?)`
-        ).bind(src, referer, ip, rating, time).run();
+            `INSERT INTO imginfo (url, ip, time) VALUES (?, ?, ?)`
+        ).bind(url, ip, time).run();
     } catch (error) {
         console.error('数据库插入失败:', error.message);
     }

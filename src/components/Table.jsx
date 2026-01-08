@@ -35,7 +35,12 @@ export default function Table({ data: initialData = [] }) {
     };
 
     const handleNameClick = (item) => {
-        setModalData(item);
+        const fullUrl = getImgUrl(item.url);
+        navigator.clipboard.writeText(fullUrl).then(() => {
+            toast.success('链接已复制');
+        }).catch(() => {
+            toast.error('复制失败');
+        });
     };
 
     const handleCloseModal = () => {
@@ -171,11 +176,8 @@ export default function Table({ data: initialData = [] }) {
                         <th className=" py-2 px-4 border-b border-gray-200 bg-gray-100  text-center text-sm font-semibold text-gray-600">name</th>
                         <th className="sticky left-0 z-10 py-2 px-4 border-b border-gray-200 bg-gray-100 text-center text-sm font-semibold text-gray-600">preview</th>
                         <th className=" py-2 px-4 border-b border-gray-200 bg-gray-100  text-center text-sm font-semibold text-gray-600">time</th>
-                        <th className=" py-2 px-4 border-b border-gray-200 bg-gray-100  text-center text-sm font-semibold text-gray-600">referer</th>
                         <th className=" py-2 px-4 border-b border-gray-200 bg-gray-100  text-center text-sm font-semibold text-gray-600">ip</th>
-                        <th className=" py-2 px-4 border-b border-gray-200 bg-gray-100  text-center text-sm font-semibold text-gray-600">PV</th>
-                        <th className=" py-2 px-4 border-b border-gray-200 bg-gray-100  text-center text-sm font-semibold text-gray-600">rating</th>
-                        <th className="sticky  right-0 z-10 py-2 px-4 border-b border-gray-200 bg-gray-100  text-center text-sm font-semibold text-gray-600">限制访问</th>
+                        <th className="sticky  right-0 z-10 py-2 px-4 border-b border-gray-200 bg-gray-100  text-center text-sm font-semibold text-gray-600">操作</th>
                     </tr>
                 </thead>
                 <tbody >
@@ -223,7 +225,11 @@ export default function Table({ data: initialData = [] }) {
 
                             <tr key={index}>
 
-                                <td onClick={() => handleNameClick(item)} className="text-center py-2 px-4 border-b border-gray-200 text-sm text-gray-700 truncate max-w-48">
+                                <td
+                                    onClick={() => handleNameClick(item)}
+                                    className="text-center py-2 px-4 border-b border-gray-200 text-sm text-blue-600 truncate max-w-48 cursor-pointer hover:bg-blue-50 hover:underline transition-colors"
+                                    title="点击复制链接"
+                                >
                                     {item.url}
                                 </td>
                                 <td
@@ -264,14 +270,9 @@ export default function Table({ data: initialData = [] }) {
                                 <td className="text-center py-2 px-4 border-b border-gray-200 text-sm text-gray-700 max-w-48">
                                     {item.time}
                                 </td>
-                                <td className="text-center py-2 px-4 border-b border-gray-200 text-sm text-gray-700 max-w-48 break-all">
-                                    <TooltipItem tooltipsText={item.referer} position="bottom" >{item.referer}</TooltipItem>
-                                </td>
                                 <td className="text-center py-2 px-4 border-b border-gray-200 text-sm text-gray-700 max-w-48 ">
                                     <TooltipItem tooltipsText={item.ip} position="bottom" >{item.ip}</TooltipItem>
                                 </td>
-                                <td className="text-center py-2 px-4 border-b border-gray-200 text-sm text-gray-700 max-w-2 ">{item.total}</td>
-                                <td className="text-center py-2 px-4 border-b border-gray-200 text-sm text-gray-700 max-w-2 ">{item.rating}</td>
                                 <td className="sticky  right-0 z-10 bg-white text-center py-2 px-4 border-b border-gray-200 text-sm text-gray-700">
                                     <div className="flex flex-row justify-center">
                                         <Switcher initialChecked={item.rating} initName={item.url} />

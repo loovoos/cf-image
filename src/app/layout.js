@@ -8,8 +8,8 @@ import 'react-photo-view/dist/react-photo-view.css';
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "图床",
-  description: "图床",
+  title: "管理系统",
+  description: "管理系统",
 };
 
 

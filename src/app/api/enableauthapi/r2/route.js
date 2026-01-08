@@ -88,9 +88,8 @@ export async function POST(request) {
 			})
 		} else {
 			try {
-				const rating_index = await getRating(env, `${req_url.origin}/api/rfile/${filename}`);
-				const nowTime = await get_nowTime()
-				await insertImageData(env.IMG, `/rfile/${filename}`, Referer, clientIp, rating_index, nowTime);
+				const nowTime = await get_nowTime();
+				await insertImageData(env.IMG, `/rfile/${filename}`, clientIp, nowTime);
 
 				return Response.json({
 					...data,
@@ -107,7 +106,8 @@ export async function POST(request) {
 
 			} catch (error) {
 				console.log(error);
-				await insertImageData(env.IMG, `/rfile/${filename}`, Referer, clientIp, -1, nowTime);
+				const nowTime = await get_nowTime();
+				await insertImageData(env.IMG, `/rfile/${filename}`, clientIp, nowTime);
 
 
 				return Response.json({
@@ -140,15 +140,14 @@ export async function POST(request) {
 
 
 
-async function insertImageData(env, src, referer, ip, rating, time) {
+async function insertImageData(env, url, ip, time) {
 	try {
-		const instdata = await env.prepare(
-			`INSERT INTO imginfo (url, referer, ip, rating, total, time)
-           VALUES ('${src}', '${referer}', '${ip}', ${rating}, 1, '${time}')`
-		).run()
+		await env.prepare(
+			`INSERT INTO imginfo (url, ip, time) VALUES (?, ?, ?)`
+		).bind(url, ip, time).run();
 	} catch (error) {
-
-	};
+		console.error('数据库插入失败:', error.message);
+	}
 }
 
 
