@@ -32,9 +32,13 @@ export async function GET(request, { params }) {
   }
 
   try {
+    // 不直接转发客户端的所有请求头，只发送必要的头信息
     const res = await fetch(`https://telegra.ph/file/${name}`, {
       method: request.method,
-      headers: request.headers,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
+        "Accept": "*/*"
+      },
       body: request.body,
     })
     if (Referer == req_url.origin + "/admin" || Referer == req_url.origin + "/list" || Referer == req_url.origin + "/") {
